@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MemoryGameView: View {
-    @StateObject private var game = MemoryGame(images: ["rubin", "_Group_-4", "heart", "shop", "redFlag"])
+    @StateObject private var game = MemoryGame(images: ["triangle", "triangle2", "romb", "star", "Ellipse", "rec"])
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var gameData: GameData
     @State private var remainingAttempts = 5
@@ -18,46 +18,150 @@ struct MemoryGameView: View {
     @ObservedObject var gameViewModel: GameViewModel
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                backgroundView
-                    .frame(width: geometry.size.width , height: geometry.size.height)
+        GeometryReader { g in
+            ZStack{
+                Image("bg")
+                    .resizable()
+                    .ignoresSafeArea()
 
-                mainContent(geometry: geometry)
+                
+                mainContent(g: g)
 
-                overlayViews(g: geometry)
             }
+            .frame(width: g.size.width , height: g.size.height)
+
 
         }
-        .toolbar(content: {
-            ToolbarItem(placement: .topBarLeading) {
-                Button{ dismiss() } label: {
-                    BackButton()
-                }
-            }
-        })
 
         .navigationBarBackButtonHidden()
     }
     
         // MARK: - Subviews
-    
-    private var backgroundView: some View {
-        Image("BG")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-    }
-    
-    private func mainContent(geometry: GeometryProxy) -> some View {
+
+    private func mainContent(g: GeometryProxy) -> some View {
         let isIPad = UIDevice.current.userInterfaceIdiom == .pad
 
         return VStack{
-            livesView(geometry: geometry)
-            cardsGridView(geometry: geometry)
-                .scaleEffect(isIPad ? 0.8 : 1.0)
+            HStack(spacing: 0){
+                Button {
+                    dismiss()
+                } label: {
+                    BackButton()
+                }
+                
+                Text("Find A Pair")
+                    .foregroundStyle(.white)
+                    .font(.title2.weight(.bold))
+                Spacer()
+
+                ZStack{
+
+                    Capsule()
+                        .foregroundStyle(.black)
+                        .opacity(0.5)
+                        .frame(width: g.size.width * 0.16, height: g.size.width * 0.06)
+
+                    HStack{
+                        Image("coin")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: g.size.width * 0.04, height: g.size.width * 0.04)
+
+                        Text("\(gameData.coins)")
+                            .foregroundStyle(.white)
+                            .font(.title3)
+
+                    }
+                    .frame(width: g.size.width * 0.17, height: g.size.width * 0.06)
+
+                }
+            }
+            .frame(width: g.size.width , height: g.size.height * 0.1)
+            Spacer()
+
+            ZStack{
+                RoundedRectangle(cornerRadius: 18)
+                    .foregroundStyle(.black)
+                    .opacity(0.3)
+                    .frame(width: g.size.width * 0.7, height: g.size.height * 0.7)
+                if game.lostMatch {
+                    VStack(){
+                        livesView(geometry: g)
+                        Text("Incorrect!!!")
+                            .foregroundStyle(.white)
+                            .font(.title)
+                        HStack{
+                            Button {
+                                game.restartGame()
+                            } label: {
+                                ZStack{
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .foregroundStyle(.red)
+                                        .frame(width: g.size.width * 0.25, height: g.size.width * 0.1)
+                                    Text("Retry")
+                                        .font(.title)
+                                        .foregroundStyle(.white)
+                                }
+
+                            }
+
+                        }
+                    }
+                    .frame(width: g.size.width * 0.6, height: g.size.height * 0.55)
+
+                } else if game.allMatchesFound{
+                    VStack(){
+                        Image("stars")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: g.size.width * 0.4, height: g.size.height * 0.3)
+
+                        Text("You Win!")
+                            .foregroundStyle(.white)
+                            .font(.title)
+                        HStack{
+                            Button {
+                                dismiss()
+                            } label: {
+                                ZStack{
+                                    Circle()
+                                        .foregroundStyle(.red)
+                                        .frame(width: g.size.width * 0.1, height: g.size.width * 0.1)
+                                    Image(systemName: "house")
+                                        .font(.title)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+
+                            Button {
+                                game.restartGame()
+                            } label: {
+                                ZStack{
+                                    Circle()
+                                        .foregroundStyle(.red)
+                                        .frame(width: g.size.width * 0.1, height: g.size.width * 0.1)
+                                    Image(systemName: "arrowtriangle.right.fill")
+                                        .font(.title)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+
+                        }
+                    }
+                    .frame(width: g.size.width * 0.6, height: g.size.height * 0.55)
+
+                } else{
+                    VStack{
+                        livesView(geometry: g)
+                        cardsGridView(geometry: g)
+                            .scaleEffect(isIPad ? 0.8 : 1.0)
+                    }
+                    .frame(width: g.size.width * 0.6, height: g.size.height * 0.5)
+
+                }
+            }
         }
-        .frame(height: geometry.size.height * 0.9)
+        .frame(height: g.size.height * 0.9)
 
 
     }
@@ -67,11 +171,15 @@ struct MemoryGameView: View {
         HStack(spacing: 10) {
             Spacer()
             ForEach(0..<5, id: \.self) { index in
-                Image("heart")
-                    .resizable()
-                    .scaledToFit()
-                    .opacity(index < remainingAttempts ? 1.0 : 0.5)
-                    .frame(width: geometry.size.width * 0.08, height: geometry.size.width * 0.08)
+                ZStack{
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundStyle(.white)
+                        .opacity(0.5)
+                        .frame(width: geometry.size.width * 0.08, height: geometry.size.width * 0.08)
+                    Image(systemName: "xmark")
+                        .opacity(index < remainingAttempts ? 0.0 : 1.0)
+                        .font(.title.weight(.bold))
+                }
             }
             Spacer()
         }
@@ -81,21 +189,18 @@ struct MemoryGameView: View {
     
     private func cardsGridView(geometry: GeometryProxy) -> some View {
         VStack {
-            let columns = [GridItem(.flexible()), GridItem(.flexible())]
-            let cardWidth = geometry.size.width * 0.38
-            let cardHeight = cardWidth * (UIImage(named: "Card")?.size.height ?? 1) / (UIImage(named: "Card")?.size.width ?? 1)
+            let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
             
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(Array(game.cards.enumerated()), id: \.element.id) { index, card in
                     CardView(card: card, geometry: geometry)
-                        .frame(width: cardWidth, height: cardHeight)
                         .onTapGesture {
                             handleCardTap(index)
                         }
                 }
             }
         }
-        .frame(height: geometry.size.height * 0.6)
+        .frame(width: geometry.size.width * 0.6, height: geometry.size.height * 0.4)
     }
 
 
@@ -110,13 +215,6 @@ struct MemoryGameView: View {
                         .ignoresSafeArea()
                     ZStack{
                         RoundedRectangle(cornerRadius: 25)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color(hex: "#7C0A99"), Color(hex: "#440952")]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
                             .frame(width: g.size.width * 0.7, height: g.size.height * 0.5)
                         VStack{
                             Text("You Win")
@@ -173,13 +271,6 @@ struct MemoryGameView: View {
                 .ignoresSafeArea()
             ZStack{
                 RoundedRectangle(cornerRadius: 25)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color(hex: "#7C0A99"), Color(hex: "#440952")]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
                     .frame(width: g.size.width * 0.7, height: g.size.height * 0.7)
                 VStack{
                     Text("Game Over")
@@ -249,12 +340,6 @@ struct CardView: View {
     @State private var scale = 1.0
     @State var geometry: GeometryProxy
     
-    // Рассчитываем размеры на основе изображения "Card"
-    private var cardSize: CGSize {
-        let width = geometry.size.width * 0.38
-        let height = width * (UIImage(named: "Card")?.size.height ?? 1) / (UIImage(named: "Card")?.size.width ?? 1)
-        return CGSize(width: width, height: height)
-    }
     
     var body: some View {
         ZStack {
@@ -262,36 +347,29 @@ struct CardView: View {
                 if flipped {
                     // Лицевая сторона карточки (градиент + изображение)
                     ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color(hex: "#7C0A99"), Color(hex: "#440952")]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                        
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundStyle(.black)
+                            .frame(width: geometry.size.width * 0.13, height: geometry.size.height * 0.12)
+
                         Image(card.imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: cardSize.width * 0.35)
+                            .frame(width: geometry.size.width * 0.05, height: geometry.size.width * 0.05)
                     }
-                    .frame(width: cardSize.width, height: cardSize.height)
+                    .frame(width: geometry.size.width * 0.13, height: geometry.size.height * 0.12)
                     .clipShape(
                         RoundedRectangle(cornerRadius: 10)
                     )
                 } else {
                     // Обратная сторона карточки (изображение "Card")
-                    Image("Card")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: cardSize.width, height: cardSize.height)
+                    RoundedRectangle(cornerRadius: 8)
+                        .foregroundStyle(.black)
+                        .frame(width: geometry.size.width * 0.13, height: geometry.size.height * 0.12)
                 }
             }
             .rotation3DEffect(.degrees(rotation), axis: (x: 0, y: 1, z: 0))
             .scaleEffect(scale)
         }
-//        .frame(width: cardSize.width, height: cardSize.height)
         .onChange(of: card.isFlipped || card.isMatched) { newValue in
             flipCard(to: newValue)
         }
@@ -313,18 +391,6 @@ struct CardView: View {
     }
 }
 
-// В cardsGridView:
-// Кастомная форма, повторяющая контуры изображения карточки
-struct ImageMaskShape: Shape {
-    let imageName: String
-    
-    func path(in rect: CGRect) -> Path {
-        // Здесь нужно создать Path, который повторяет форму вашей картинки "Card"
-        // Для простоты используем закругленный прямоугольник с теми же параметрами, что и у картинки
-        let cornerRadius: CGFloat = 10
-        return Path(roundedRect: rect, cornerRadius: cornerRadius)
-    }
-}
 
 // В cardsGridView измените расчет размеров:
 extension AnyTransition {

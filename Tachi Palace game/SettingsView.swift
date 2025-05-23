@@ -1,3 +1,11 @@
+//
+//  SettingsView.swift
+//  Tachi Palace game
+//
+//  Created by Mac on 20.05.2025.
+//
+
+
 import SwiftUI
 
 struct SettingsView: View {
@@ -9,22 +17,34 @@ struct SettingsView: View {
     var body: some View {
         GeometryReader { g in
             ZStack {
-                Image("BG")
+                Image("bg")
                     .resizable()
                     .ignoresSafeArea()
                 
-                VStack(spacing: 20) {
+                VStack{
                     // Header
+                    HStack{
+                        Button {
+                            dismiss()
+                        } label: {
+                            BackButton()
+                        }
+                        Text("Settings")
+                            .foregroundStyle(.white)
+                            .font(.title2.weight(.bold))
+                        
+                        Spacer()
+                        
+                    }
+                    .frame(width: g.size.width * 0.9)
+                    Spacer()
+
+
                         ZStack{
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [Color(hex: "#7C0A99"), Color(hex: "#440952")]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .frame(width: g.size.width * 0.9 , height: g.size.height * 0.1)
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundStyle(.black)
+                                .opacity(0.5)
+                                .frame(width: g.size.width * 0.9, height: g.size.height * 0.2)
                             HStack{
                                 Text("Music")
                                     .foregroundStyle(.white)
@@ -52,15 +72,10 @@ struct SettingsView: View {
 
                         }
                         ZStack{
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [Color(hex: "#7C0A99"), Color(hex: "#440952")]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .frame(width: g.size.width * 0.9 , height: g.size.height * 0.1)
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundStyle(.black)
+                                .opacity(0.5)
+                                .frame(width: g.size.width * 0.9, height: g.size.height * 0.2)
                             HStack{
                                 Text("Sounds")
                                     .foregroundStyle(.white)
@@ -88,15 +103,10 @@ struct SettingsView: View {
                         }
                     
                         ZStack{
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [Color(hex: "#7C0A99"), Color(hex: "#440952")]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .frame(width: g.size.width * 0.9 , height: g.size.height * 0.1)
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundStyle(.black)
+                                .opacity(0.5)
+                                .frame(width: g.size.width * 0.9, height: g.size.height * 0.2)
                             HStack{
                                 Text("Vibro")
                                     .foregroundStyle(.white)
@@ -121,19 +131,13 @@ struct SettingsView: View {
                     Spacer()
 
                 }
-                .frame(width: g.size.width * 0.9, height: g.size.height * 0.6)
+                .frame(width: g.size.width * 0.9, height: g.size.height * 0.9)
 
             }
             .frame(width: g.size.width, height: g.size.height )
 
         }
-        .toolbar(content: {
-            ToolbarItem(placement: .topBarLeading) {
-                Button{ dismiss() } label: {
-                    BackButton()
-                }
-            }
-        })
+
 
         .navigationBarBackButtonHidden()
     }

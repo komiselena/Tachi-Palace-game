@@ -18,7 +18,7 @@ class MemoryGameViewModel: ObservableObject {
     @Published var isWon = false
     @Published var coins = 0
 
-    private let cards = ["rubin", "_Group_-4", "heart", "shop", "redFlag", "Achievs", "battle", "flag", "bomb", "coin"]
+    private let cards = ["triangle", "triangle2", "romb", "star", "Ellipse", "rec", "rec2", "star3"]
 
     func startGame() {
         sequence = []

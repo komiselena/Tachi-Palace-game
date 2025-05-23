@@ -12,200 +12,152 @@ struct MainMenuView: View {
     @StateObject private var gameViewModel = GameViewModel()
     @State private var selectedTab: Int = 0
     
-    // Gradient colors for the tab bar
-    private let gradientColors = [Color(hex: "#7C0A99"), Color(hex: "#440952")]
-    private let tabBarHeight: CGFloat = 80  // Increased height
-    
     var body: some View {
         if #available(iOS 16.0, *) {
             NavigationStack {
-                ZStack(alignment: .bottom) {
-                    // Main content
-                    TabView(selection: $selectedTab) {
-                        HomeView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(0)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                        
-                        ShopView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(1)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                        
-                        AchievementsView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(2)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                        
-                        SettingsView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(3)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                    }
-                    .ignoresSafeArea(.all, edges: .bottom)
-                    
-                    // Custom tab bar
-                    VStack(spacing: 0) {
-                        // Tab items container
-                        HStack(spacing: 0) {
-                            ForEach(0..<4, id: \.self) { index in
-                                TabItem(
-                                    imageName: tabImageName(for: index),
-                                    title: tabeTitle(for: index),
-                                    isSelected: selectedTab == index,
-                                    gradientColors: gradientColors
-                                )
-                                .frame(maxWidth: .infinity)
-                                .onTapGesture {
-                                    selectedTab = index
+                GeometryReader { g in
+                    ZStack(alignment: .bottom) {
+                        Image("bg")
+                            .resizable()
+                            .ignoresSafeArea()
+                        VStack{
+                            Image("logo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: g.size.width * 0.45, height: g.size.width * 0.45)
+                            Spacer()
+                            HStack{
+                                NavigationLink {
+                                    MiniGamesView(gameData: gameData, gameViewModel: gameViewModel)
+                                } label: {
+                                    ZStack{
+                                        RoundedRectangle(cornerRadius: 18)
+                                            .foregroundStyle(.red)
+                                            .frame(width: g.size.width * 0.2, height: g.size.height * 0.15)
+                                        Text("Mini Games")
+                                            .foregroundStyle(.white)
+                                            .font(.title3.weight(.bold))
+                                    }
                                 }
-                            }
-                        }
-                        .frame(height: tabBarHeight)
-                        .background(
-                            LinearGradient(
-                                gradient: Gradient(colors: gradientColors),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .cornerRadius(20, corners: [.topLeft, .topRight]) // Закругление 20pt сверху
-                            .edgesIgnoringSafeArea(.bottom) // Игнорируем безопасную область снизу
+                                Spacer()
+                                NavigationLink {
+                                    ShopView(gameData: gameData, gameViewModel: gameViewModel)
+                                } label: {
+                                    ZStack{
+                                        RoundedRectangle(cornerRadius: 18)
+                                            .foregroundStyle(.red)
+                                            .frame(width: g.size.width * 0.2, height: g.size.height * 0.15)
+                                        Text("Shop")
+                                            .foregroundStyle(.white)
+                                            .font(.title3.weight(.bold))
+                                    }
 
-                        )
-                        
+                                }
+                                Spacer()
+                                NavigationLink {
+                                    AchievementsView(gameData: gameData, gameViewModel: gameViewModel)
+                                } label: {
+                                    ZStack{
+                                        RoundedRectangle(cornerRadius: 18)
+                                            .foregroundStyle(.red)
+                                            .frame(width: g.size.width * 0.2, height: g.size.height * 0.15)
+                                        Text("Achievements")
+                                            .foregroundStyle(.white)
+                                            .font(.title3.weight(.bold))
+                                    }
+
+                                }
+                                Spacer()
+                                NavigationLink {
+                                    GameContainerView(gameViewModel: gameViewModel, gameData: gameData)
+                                } label: {
+                                    ZStack{
+                                        RoundedRectangle(cornerRadius: 18)
+                                            .foregroundStyle(.red)
+                                            .frame(width: g.size.width * 0.2, height: g.size.height * 0.15)
+                                        Text("Play Game")
+                                            .foregroundStyle(.white)
+                                            .font(.title3.weight(.bold))
+                                    }
+
+                                }
+
+                            }
+                            .frame(width: g.size.width * 0.9, height: g.size.height * 0.1)
+                            .padding(.bottom, g.size.height * 0.3)
+                            Spacer()
+                        }
+                        .frame(width: g.size.width * 0.9, height: g.size.height * 0.9)
+
                     }
-                    .frame(height: tabBarHeight)
-                    .edgesIgnoringSafeArea(.bottom) // Игнорируем безопасную область снизу
+                    .overlay (
+                        HStack{
+                            NavigationLink {
+                                SettingsView(gameData: gameData, gameViewModel: gameViewModel)
+                            } label: {
+                                ZStack{
+                                    Circle()
+                                        .foregroundStyle(.red)
+                                        .frame(width: g.size.width * 0.075, height: g.size.width * 0.075)
+                                    
+                                    Image(systemName: "gear")
+                                        .foregroundStyle(.white)
+                                        .font(.title)
+                                }
+                                .padding(.top, g.size.height * 0.1)
+
+                            }
+
+                            Spacer()
+                                .frame(width: g.size.width * 0.8)
+                                
+                            ZStack{
+
+                                Capsule()
+                                    .foregroundStyle(.black)
+                                    .opacity(0.5)
+                                    .frame(width: g.size.width * 0.13, height: g.size.width * 0.06)
+
+                                HStack{
+                                    Image("coin")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: g.size.width * 0.04, height: g.size.width * 0.04)
+
+                                    Text("\(gameData.coins)")
+                                        .foregroundStyle(.white)
+                                        .font(.title3)
+
+                                }
+                                .frame(width: g.size.width * 0.15, height: g.size.width * 0.06)
+
+                            }
+                            .padding(.top, g.size.height * 0.1)
+
+                        }
+//                            .padding(.top, g.size.height * 0.1)
+                        ,alignment: .top
+
+
+                    )
+
+                    .frame(width: g.size.width, height: g.size.height)
+
+
                 }
-                .ignoresSafeArea(.keyboard)
+                
 
             }
+            
         } else {
             NavigationView {
                 ZStack(alignment: .bottom) {
-                    TabView(selection: $selectedTab) {
-                        HomeView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(0)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                        
-                        ShopView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(1)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                        
-                        AchievementsView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(2)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                        
-                        SettingsView(gameData: gameData, gameViewModel: gameViewModel)
-                            .tag(3)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
                     
-                    // Custom tab bar for iOS 15
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            ForEach(0..<4, id: \.self) { index in
-                                TabItem(
-                                    imageName: tabImageName(for: index),
-                                    title: tabeTitle(for: index),
-                                    isSelected: selectedTab == index,
-                                    gradientColors: gradientColors
-                                )
-                                .frame(maxWidth: .infinity)
-                                .onTapGesture {
-                                    selectedTab = index
-                                }
-                            }
-                        }
-                        .frame(height: tabBarHeight)
-                        .background(
-                            LinearGradient(
-                                gradient: Gradient(colors: gradientColors),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .cornerRadius(20, corners: [.topLeft, .topRight]) // Закругление 20pt сверху
-
-                        )
-                        
-                    }
-                    .frame(height: tabBarHeight)
-                    .edgesIgnoringSafeArea(.bottom)
                 }
             }
         }
     }
     
-    private func tabImageName(for index: Int) -> String {
-        switch index {
-        case 0: return "flag"
-        case 1: return "shop"
-        case 2: return "Achievs"
-        case 3: return "settings"
-        default: return ""
-        }
-    }
-    private func tabeTitle(for index: Int) -> String {
-        switch index {
-        case 0: return "Home"
-        case 1: return "Shop"
-        case 2: return "Achievs"
-        case 3: return "Settings"
-        default: return ""
-        }
-    }
-
-}
-
-// Custom tab item view with larger icons
-// Custom tab item view
-struct TabItem: View {
-    let imageName: String
-    let title: String
-    let isSelected: Bool
-    let gradientColors: [Color]
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            // Квадрат цвета #440952 под каждой иконкой
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(hex: "#440952"))
-                    .frame(width: 60, height: 60)
-                VStack{
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                    Text(title)
-                        .foregroundStyle(.white)
-                        .font(.system(size: 12))
-
-                }
-            }
-            
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-
-// Corner radius extension (same as before)
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
-}
-
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-    
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(
-            roundedRect: rect,
-            byRoundingCorners: corners,
-            cornerRadii: CGSize(width: radius, height: radius)
-        )
-        return Path(path.cgPath)
-    }
 }
 
 #Preview {
